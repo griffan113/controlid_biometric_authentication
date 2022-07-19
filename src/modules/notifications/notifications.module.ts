@@ -2,7 +2,7 @@ import Module from '@shared/decorators/Module';
 import routes from './infra/http/routes';
 
 @Module({
-  name: 'Events',
+  name: 'Notifications',
   router: routes,
 })
-export default class EventsModule {}
+export default class NotificationsModule {}
