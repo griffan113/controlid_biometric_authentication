@@ -1,7 +1,8 @@
 import { Router } from 'express';
+import { celebrate, Segments, Joi } from 'celebrate';
 
 import OnCreateAccessLogController from '@modules/notifications/infra/http/controllers/OnCreateAccessLog.controller';
-import { celebrate, Segments, Joi } from 'celebrate';
+import Events from '@modules/notifications/types/Events';
 
 const notificationsRouter = Router();
 
@@ -19,10 +20,12 @@ notificationsRouter.post(
             values: Joi.object({
               id: Joi.string().required(),
               time: Joi.number().required(),
-              event: Joi.string().required(),
+              event: Joi.number()
+                .valid(...Object.values(Events))
+                .required(),
               device_id: Joi.number().required(),
               identifier_id: Joi.string().required(),
-              user_id: Joi.string().required(),
+              user_id: Joi.number().required(),
               portal_id: Joi.string().required(),
               identification_rule_id: Joi.string().required(),
               card_value: Joi.string().required(),

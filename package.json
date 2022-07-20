@@ -4,10 +4,10 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev:build": "npm run build && node --inspect dist/shared/infra/http/server.js",
+    "dev:build": "npm run build && node --inspect dist/main.js",
     "dev:server": "cross-env PRODUCTION=false nodemon --delay 0 --ext ts --exec \"npm run dev:build\"",
     "build": "swc src -d dist",
-    "server": "cross-env PRODUCTION=true node dist/shared/infra/http/server.js",
+    "server": "cross-env PRODUCTION=true node dist/main.js",
     "test": "jest",
     "prepare": "husky install",
     "format": "prettier --write \"src/**/*.ts\"",
