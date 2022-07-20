@@ -2,9 +2,10 @@ import axios, { AxiosError, AxiosInstance } from 'axios';
 import { injectable } from 'tsyringe';
 
 import AppError from '@shared/errors/AppError';
+import IControlIdApiProvider from '@shared/container/providers/ControlIdApiProvider/models/IControlIdApiProvider';
 
 @injectable()
-export default class AxiosControlIDAPIProvider {
+export default class AxiosControlIDApiProvider implements IControlIdApiProvider {
   private _baseURL: string;
 
   private _login: string;
