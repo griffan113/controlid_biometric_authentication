@@ -3,10 +3,10 @@ import { AxiosError } from 'axios';
 
 import IObjectChanges from '@modules/notifications/types/IObjectChanges';
 import IUser from '@modules/notifications/types/IUser';
+import ITemplate from '@modules/notifications/types/ITemplate';
 import Events from '@modules/notifications/types/Events';
 import IControlIdApiProvider from '@shared/container/providers/ControlIdApiProvider/models/IControlIdApiProvider';
 import AppError from '@shared/errors/AppError';
-import IWebSocketProvider from '@shared/container/providers/WebSocketProvider/models/IWebSocketProvider';
 
 interface IRequest {
   object_changes: IObjectChanges[];
@@ -19,9 +19,6 @@ class OnCreateAccessLogService {
   constructor(
     @inject('ControlIdAPIProvider')
     private controlIdApiProvider: IControlIdApiProvider,
-
-    @inject('WebSocketProvider')
-    private webSocketProvider: IWebSocketProvider,
   ) {}
 
   public async execute({ object_changes }: IRequest) {
@@ -40,18 +37,36 @@ class OnCreateAccessLogService {
     try {
       const getUsersResponse = await this.controlIdApiProvider.instance.post<{ users: IUser[] }>('load_objects.fcgi', {
         object: 'users',
+        where: {
+          users: {
+            id: object_changes[0].values.user_id,
+          },
+        },
       });
 
-      const users = getUsersResponse.data.users;
+      const {
+        users: [user],
+      } = getUsersResponse.data;
 
-      const findLoggedUser = users.find(user => user.id === object_changes[0].values.user_id);
+      if (user) {
+        const getUserTemplateResponse = await this.controlIdApiProvider.instance.post<{ templates: ITemplate[] }>('load_objects.fcgi', {
+          object: 'templates',
+          where: {
+            templates: {
+              user_id: user.id,
+            },
+          },
+        });
 
-      console.log(findLoggedUser);
+        const {
+          templates: [template],
+        } = getUserTemplateResponse.data;
 
-      this.webSocketProvider.server.emit('auth', findLoggedUser);
+        console.log(template);
+      }
     } catch (error) {
       if (error instanceof AxiosError) {
-        throw new AppError(`Falha ao realizar a requisição para buscar o usuário: ${error.message}`);
+        throw new AppError(`Falha ao realizar a requisição à API Control ID: ${error.message}`);
       }
     }
   }
